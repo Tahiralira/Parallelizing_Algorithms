@@ -3,10 +3,12 @@
 #include <math.h>
 #include <omp.h>
 #include <string.h>
+#include <unistd.h>  // Include for sleep and write operations
 
-#define NUMBER_OF_POINTS 200000 // Increased number of points //Increased them from 100000 trying to increase computation time to 1200 seconds ~20 minutes
-#define D 10                     // Increased dimensions of data
-#define K 20                     // Increased number of clusters
+#define NUMBER_OF_POINTS 1000000 // Increased number of points to potentially extend execution time
+#define D 10                    // Dimensions of data
+#define K 20                    // Number of clusters
+#define MAX_ITERATIONS 300      // Increased number of iterations
 
 float *create_rand_data(int num_points) {
     float *data = (float *)malloc(num_points * D * sizeof(float));
@@ -82,6 +84,20 @@ void print_centroids(float *centroids, int k, int dim) {
     printf("\n");
 }
 
+void print_progress(int iteration, int total) {
+    const int barWidth = 50;
+    float progress = (float)iteration / total;
+    printf("[");
+    int pos = barWidth * progress;
+    for (int i = 0; i < barWidth; ++i) {
+        if (i < pos) printf("=");
+        else if (i == pos) printf(">");
+        else printf(" ");
+    }
+    printf("] %d%%\r", (int)(progress * 100));
+    fflush(stdout);  // Flush to update the same line
+}
+
 int main() {
     srand(12345);
 
@@ -106,7 +122,7 @@ int main() {
     double start_time = omp_get_wtime();
     int iterations = 0;
 
-    while (1) {
+    while (iterations < MAX_ITERATIONS) {
         memset(sums, 0, K * D * sizeof(float));
         memset(counts, 0, K * sizeof(int));
 
@@ -119,15 +135,12 @@ int main() {
         }
 
         update_centroid(sums, counts, centroids, K, D);
+        print_progress(iterations + 1, MAX_ITERATIONS);  // Update progress
         iterations++;
-
-        // Convergence check or maximum iterations
-        if (iterations >= 100) {  // stop after 100 iterations
-            break;
-        }
     }
 
     double end_time = omp_get_wtime();
+    printf("\n");  // Ensure the next print starts on a new line
     print_centroids(centroids, K, D);
     printf("Total iterations: %d\n", iterations);
     printf("Total time taken: %f seconds\n", end_time - start_time);
