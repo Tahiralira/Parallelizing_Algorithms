@@ -61,4 +61,4 @@ gcc -fopenmp -o kmeans_omp kmeans_omp.c
 ## Acknowledgments
 Special thanks to Ashad Haseeb Ahad and the computational resources provided by our biological creators and spiritual creator, which were invaluable to our research.
 
-For more detailed information about the methodologies, analyses, and results of our project, please refer to our [full project report](./pdcReport.pdf).
+For more detailed information about the methodologies, analyses, and results of our project, please refer to our [full project report](./Report.pdf).
